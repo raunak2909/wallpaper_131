@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:wallpaper_app/animals.dart';
+import 'package:wallpaper_app/bloc/wallpaper_bloc.dart';
 import 'package:wallpaper_app/film.dart';
 import 'package:wallpaper_app/flower.dart';
 import 'package:wallpaper_app/food.dart';
 
 import 'package:wallpaper_app/sports.dart';
 import 'package:wallpaper_app/street_photography.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'natural.dart';
 
@@ -103,6 +105,14 @@ class WallpaperPageState extends State<WallpaperPage> {
     },
     // {'name': "Flowers", 'img_cat': 'assets/images/img_natural13.jpg'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<WallpaperBloc>().add(GetTrendingWallpaper());
+  }
+
   @override
   Widget build(BuildContext context) {
     listImage.shuffle();
@@ -184,25 +194,37 @@ class WallpaperPageState extends State<WallpaperPage> {
                     ),
                     SizedBox(
                       height: 300,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: listImage.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.only(right: 20),
-                            width: 200,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: AssetImage(
-                                  listImage[index],
-                                ),
-                              ),
-                            ),
-                            // child: Image.asset(listImage[index]),
-                          );
+                      child: BlocBuilder<WallpaperBloc, WallpaperState>(
+                        builder: (context, state) {
+                          if(state is WallpaperLoadingState){
+                            return Center(child: CircularProgressIndicator(),);
+                          } else if(state is WallpaperErrorState){
+                            return Center(child: Text('Error: ${state.errorMsg}'),);
+                          } else if(state is WallpaperLoadedState){
+                            return ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: state.wallpaperModel.photos!.length,
+                              itemBuilder: (context, index) {
+                                var eachWall = state.wallpaperModel.photos![index].src!.portrait!;
+                                return Container(
+                                  margin: const EdgeInsets.only(right: 20),
+                                  width: 200,
+                                  height: 200,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(
+                                        eachWall,
+                                      ),
+                                    ),
+                                  ),
+                                  // child: Image.asset(listImage[index]),
+                                );
+                              },
+                            );
+                          }
+                          return Container();
                         },
                       ),
                     ),
