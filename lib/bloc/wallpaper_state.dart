@@ -12,6 +12,11 @@ class WallpaperLoadedState extends WallpaperState {
   WallpaperLoadedState({required this.wallpaperModel});
 }
 
+class WallpaperInternetErrorState extends WallpaperState {
+  String errorMsg;
+  WallpaperInternetErrorState({required this.errorMsg});
+}
+
 class WallpaperErrorState extends WallpaperState {
   String errorMsg;
   WallpaperErrorState({required this.errorMsg});

@@ -198,8 +198,10 @@ class WallpaperPageState extends State<WallpaperPage> {
                         builder: (context, state) {
                           if(state is WallpaperLoadingState){
                             return Center(child: CircularProgressIndicator(),);
+                          } else if(state is WallpaperInternetErrorState){
+                            return Center(child: Text(state.errorMsg, style: TextStyle(fontWeight: FontWeight.bold),),);
                           } else if(state is WallpaperErrorState){
-                            return Center(child: Text('Error: ${state.errorMsg}'),);
+                            return Center(child: Text(state.errorMsg),);
                           } else if(state is WallpaperLoadedState){
                             return ListView.builder(
                               scrollDirection: Axis.horizontal,

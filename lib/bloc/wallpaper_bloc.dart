@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:wallpaper_app/api/my_exceptions.dart';
 import 'package:wallpaper_app/model/data_photo_model.dart';
 
 import '../api/api_helper.dart';
@@ -15,12 +16,18 @@ class WallpaperBloc extends Bloc<WallpaperEvent, WallpaperState> {
   WallpaperBloc({required this.apiHelper}) : super(WallpaperInitialState()) {
     on<GetTrendingWallpaper>((event, emit) async{
       emit(WallpaperLoadingState());
-      var res = await apiHelper.getApi(url: "${Urls.trendingWallpaper}");
-      if(res!=null){
+
+      try{
+        var res = await apiHelper.getApi(url: "${Urls.trendingWallpaper}");
         emit(WallpaperLoadedState(wallpaperModel: DataPhotoModel.fromJson(res)));
-      } else {
-        emit(WallpaperErrorState(errorMsg: "Internet Error"));
+      } catch(e){
+        if(e is FetchDataException){
+          emit(WallpaperInternetErrorState(errorMsg: e.ToString()));
+        } else {
+          emit(WallpaperErrorState(errorMsg: (e as MyException).ToString()));
+        }
       }
+
     });
   }
 }
