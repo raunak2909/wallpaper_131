@@ -13,7 +13,7 @@ class ApiHelper {
       var res = await http.get(Uri.parse(url),
           headers: mHeader ??
               {
-                "Authorization": "nXWH9BLpCYtVtyjDTbJB3Hf20uneSxZcYisVLVmNDV4PamGm6EeVDgZmm"
+                "Authorization": "nXWH9BLpCYtVtyjDTbJB3Hf20uneSxZcYisVLVmNDV4PamGm6EeVDgZm"
               });
 
       return returnDataResponse(res);

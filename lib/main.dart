@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wallpaper_app/api/api_helper.dart';
 import 'package:wallpaper_app/bloc/wallpaper_bloc.dart';
-import 'package:wallpaper_app/splash_screen.dart';
-import 'package:wallpaper_app/wallpaper_page.dart';
+import 'package:wallpaper_app/screens/splash_screen.dart';
+import 'package:wallpaper_app/screens/wallpaper_list/bloc/wallpaper_list_bloc.dart';
+import 'package:wallpaper_app/screens/wallpaper_page.dart';
 
 void main() {
-  runApp(BlocProvider(
-    create: (context) => WallpaperBloc(apiHelper: ApiHelper()),
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(
+        create: (context) => WallpaperBloc(apiHelper: ApiHelper()),
+      ),
+      BlocProvider(
+        create: (context) => WallpaperListBloc(apiHelper: ApiHelper()),
+      ),
+    ],
     child: MyApp(),
   ));
 }

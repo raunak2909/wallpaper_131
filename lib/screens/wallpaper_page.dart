@@ -9,7 +9,7 @@ import 'package:wallpaper_app/sports.dart';
 import 'package:wallpaper_app/street_photography.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'natural.dart';
+import 'wallpaper_list/natural.dart';
 
 class WallpaperPage extends StatefulWidget {
   @override
@@ -38,27 +38,34 @@ class WallpaperPageState extends State<WallpaperPage> {
   ];
 
   List listColor = [
-    Colors.blueAccent[400],
-    Colors.redAccent[400],
-    Colors.greenAccent[400],
-    Colors.amber,
-    Colors.deepOrange,
-    Colors.amberAccent,
-    Colors.black,
-    Colors.blue,
-    Colors.blueGrey,
-    Colors.brown,
-    Colors.cyan,
-    Colors.deepOrange,
-    Colors.orange,
-    Colors.deepPurple,
-    Colors.indigo,
-    Colors.purple,
-    Colors.lightBlue,
-    Colors.pink,
-    Colors.lime,
-    Colors.teal,
-    Colors.tealAccent
+    {
+      "color": Colors.blue,
+      "code": "2196F3"
+    },
+    {
+      "color": Colors.deepOrange,
+      "code": "FF5722"
+    },
+    {
+      "color": Colors.black,
+      "code": "000000"
+    },
+    {
+      "color": Colors.white,
+      "code": "ffffff"
+    },
+    {
+      "color": Colors.blue,
+      "code": "blue"
+    },
+    {
+      "color": Colors.green,
+      "code": "4CAF50"
+    },
+    {
+      "color": Colors.yellow,
+      "code": "FFEB3B"
+    },
   ];
 
   List<Map<String, dynamic>> categoriesName = [
@@ -105,6 +112,10 @@ class WallpaperPageState extends State<WallpaperPage> {
     },
     // {'name': "Flowers", 'img_cat': 'assets/images/img_natural13.jpg'},
   ];
+
+  var queryController = TextEditingController();
+  var searchQuery = "nature"; //default
+  var searchColorTone = "";
 
   @override
   void initState() {
@@ -155,13 +166,24 @@ class WallpaperPageState extends State<WallpaperPage> {
                             )
                           ],
                         ),
-                        child: const TextField(
+                        child: TextField(
+                          controller: queryController,
                           decoration: InputDecoration(
                             hintText: 'Find Wallpaper..',
                             hintStyle: TextStyle(
                               color: Color.fromARGB(255, 152, 152, 152),
                             ),
-                            suffixIcon: Icon(Icons.image_search),
+                            suffixIcon: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => WallpaperListPage(
+                                            mQuery: queryController.text
+                                                .toString()),
+                                      ));
+                                },
+                                child: Icon(Icons.image_search)),
                             suffixIconColor: Color.fromARGB(255, 172, 172, 172),
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
@@ -196,18 +218,29 @@ class WallpaperPageState extends State<WallpaperPage> {
                       height: 300,
                       child: BlocBuilder<WallpaperBloc, WallpaperState>(
                         builder: (context, state) {
-                          if(state is WallpaperLoadingState){
-                            return Center(child: CircularProgressIndicator(),);
-                          } else if(state is WallpaperInternetErrorState){
-                            return Center(child: Text(state.errorMsg, style: TextStyle(fontWeight: FontWeight.bold),),);
-                          } else if(state is WallpaperErrorState){
-                            return Center(child: Text(state.errorMsg),);
-                          } else if(state is WallpaperLoadedState){
+                          if (state is WallpaperLoadingState) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (state is WallpaperInternetErrorState) {
+                            return Center(
+                              child: Text(
+                                state.errorMsg,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            );
+                          } else if (state is WallpaperErrorState) {
+                            return Center(
+                              child: Text(state.errorMsg),
+                            );
+                          } else if (state is WallpaperLoadedState) {
                             return ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: state.wallpaperModel.photos!.length,
                               itemBuilder: (context, index) {
-                                var eachWall = state.wallpaperModel.photos![index].src!.portrait!;
+                                var eachWall = state.wallpaperModel
+                                        .photos![index].src!.portrait ??
+                                    "default app logo url";
                                 return Container(
                                   margin: const EdgeInsets.only(right: 20),
                                   width: 200,
@@ -252,13 +285,26 @@ class WallpaperPageState extends State<WallpaperPage> {
                         scrollDirection: Axis.horizontal,
                         itemCount: listColor.length,
                         itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: listColor[index],
-                              borderRadius: BorderRadius.circular(10),
+                          return InkWell(
+                            onTap: (){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WallpaperListPage(
+                                    mQuery: queryController.text.isNotEmpty ? queryController.text.toString() : "car",
+                                    mColor: listColor[index]['code'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 10),
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: listColor[index]['color'] as Color,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           );
                         },
@@ -293,81 +339,14 @@ class WallpaperPageState extends State<WallpaperPage> {
                         itemBuilder: (Context, index) {
                           return InkWell(
                             onTap: () {
-                              if (index == 0) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Natural(
-                                      title: categoriesName[index]['name'],
+                                    builder: (context) => WallpaperListPage(
+                                      mQuery: categoriesName[index]['name'],
                                     ),
                                   ),
                                 );
-                              } else if (index == 1) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Flower(
-                                      title: categoriesName[index]['name'],
-                                    ),
-                                  ),
-                                );
-                              } else if (index == 2) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Sports(
-                                      title: categoriesName[index]['name'],
-                                    ),
-                                  ),
-                                );
-                              } else if (index == 3) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Film(
-                                      title: categoriesName[index]['name'],
-                                    ),
-                                  ),
-                                );
-                              } else if (index == 4) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => StreetPhotography(
-                                      title: categoriesName[index]['name'],
-                                    ),
-                                  ),
-                                );
-                              } else if (index == 5) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Animals(
-                                      title: categoriesName[index]['name'],
-                                    ),
-                                  ),
-                                );
-                              } else if (index == 6) {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => Scaffold(
-                                //       appBar: AppBar(
-                                //         title: categoriesName[index]['name'],
-                                //       ),
-                                //     ),
-                                //   ),
-                                // );
-                              } else if (index == 7) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Food(
-                                      title: categoriesName[index]['name'],
-                                    ),
-                                  ),
-                                );
-                              }
                             },
                             child: Stack(
                               children: [
