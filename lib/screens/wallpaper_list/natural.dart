@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wallpaper_app/bloc/wallpaper_bloc.dart';
+import 'package:wallpaper_app/screens/wallpaper_detail_page.dart';
 import 'package:wallpaper_app/screens/wallpaper_list/bloc/wallpaper_list_bloc.dart';
 
 class WallpaperListPage extends StatefulWidget {
@@ -97,16 +98,31 @@ class _WallpaperListPageState extends State<WallpaperListPage> {
                                 childAspectRatio: 9 / 16,
                               ),
                               itemBuilder: (context, index) {
-                                return Container(
-                                  width: 150,
-                                  height: 300,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(
-                                        state.wallpaperModel.photos![index].src!
-                                            .portrait!,
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              WallpaperDetailPage(
+                                                  imgUrl: state
+                                                      .wallpaperModel
+                                                      .photos![index]
+                                                      .src!
+                                                      .portrait!),
+                                        ));
+                                  },
+                                  child: Container(
+                                    width: 150,
+                                    height: 300,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      image: DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: NetworkImage(
+                                          state.wallpaperModel.photos![index]
+                                              .src!.portrait!,
+                                        ),
                                       ),
                                     ),
                                   ),

@@ -4,6 +4,7 @@ import 'package:wallpaper_app/bloc/wallpaper_bloc.dart';
 import 'package:wallpaper_app/film.dart';
 import 'package:wallpaper_app/flower.dart';
 import 'package:wallpaper_app/food.dart';
+import 'package:wallpaper_app/screens/wallpaper_detail_page.dart';
 
 import 'package:wallpaper_app/sports.dart';
 import 'package:wallpaper_app/street_photography.dart';
@@ -241,20 +242,25 @@ class WallpaperPageState extends State<WallpaperPage> {
                                 var eachWall = state.wallpaperModel
                                         .photos![index].src!.portrait ??
                                     "default app logo url";
-                                return Container(
-                                  margin: const EdgeInsets.only(right: 20),
-                                  width: 200,
-                                  height: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(
-                                        eachWall,
+                                return InkWell(
+                                  onTap: (){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => WallpaperDetailPage(imgUrl: eachWall),));
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 20),
+                                    width: 200,
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      image: DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: NetworkImage(
+                                          eachWall,
+                                        ),
                                       ),
                                     ),
+                                    // child: Image.asset(listImage[index]),
                                   ),
-                                  // child: Image.asset(listImage[index]),
                                 );
                               },
                             );
