@@ -6,5 +6,6 @@ abstract class WallpaperListEvent {}
 class GetSearchWallpaper extends WallpaperListEvent{
   String query;
   String? mColor;
-  GetSearchWallpaper({required this.query, this.mColor});
+  String pageNo;
+  GetSearchWallpaper({required this.query, this.mColor, this.pageNo="1"});
 }

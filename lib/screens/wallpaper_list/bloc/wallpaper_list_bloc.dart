@@ -19,7 +19,7 @@ class WallpaperListBloc extends Bloc<WallpaperListEvent, WallpaperListState> {
 
       try{
         print("Url : ${Urls.searchWallpaper}?query=${event.query}");
-        var res = await apiHelper.getApi(url: "${Urls.searchWallpaper}?query=${event.query}&color=${event.mColor??""}&per_page=70");
+        var res = await apiHelper.getApi(url: "${Urls.searchWallpaper}?query=${event.query}&color=${event.mColor??""}&per_page=70&page=${event.pageNo}");
         emit(WallpaperListLoadedState(wallpaperModel: DataPhotoModel.fromJson(res)));
       } catch(e){
         emit(WallpaperListErrorState(errorMsg: (e as MyException).ToString()));

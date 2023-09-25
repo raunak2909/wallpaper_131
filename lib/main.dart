@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wallpaper_app/api/api_helper.dart';
 import 'package:wallpaper_app/bloc/wallpaper_bloc.dart';
+import 'package:wallpaper_app/screens/scroll_list_page.dart';
 import 'package:wallpaper_app/screens/splash_screen.dart';
 import 'package:wallpaper_app/screens/wallpaper_list/bloc/wallpaper_list_bloc.dart';
 import 'package:wallpaper_app/screens/wallpaper_page.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Wallpaper App',
       theme: ThemeData(primaryColor: Colors.deepPurple),
-      home: SplashScreen(),
+      home: ScrollListPage(),
     );
   }
 }
