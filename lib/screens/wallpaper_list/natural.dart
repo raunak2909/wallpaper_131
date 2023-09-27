@@ -15,31 +15,29 @@ class WallpaperListPage extends StatefulWidget {
   State<WallpaperListPage> createState() => _WallpaperListPageState();
 }
 
-class _WallpaperListPageState extends State<WallpaperListPage> {
-  List<PhotoModel> listPhotos = [];
+List<PhotoModel> arrPhotos = [];
 
-  List listNaturalImage = [
-    'assets/images/natural/img_natural16.jpg',
-    'assets/images/natural/img_natural15.jpg',
-    'assets/images/natural/img_natural14.jpg',
-    'assets/images/natural/img_natural13.jpg',
-    'assets/images/natural/img_natural12.jpg',
-    'assets/images/natural/img_natural11.jpg',
-    'assets/images/natural/img_natural10.jpg',
-    'assets/images/natural/img_natural9.jpg',
-    'assets/images/natural/img_natural8.jpg',
-    'assets/images/natural/img_natural7.webp',
-    'assets/images/natural/img_natural6.jpg',
-    'assets/images/natural/img_natural5.jpg',
-    'assets/images/natural/img_natural4.jpg',
-    'assets/images/natural/img_natural3.jpg',
-    'assets/images/natural/img_natural2.jpg',
-    'assets/images/natural/img_natural.jpeg',
-  ];
+class _WallpaperListPageState extends State<WallpaperListPage> {
+
+  int mPageNo = 1;
+  late ScrollController mController;
+  int totalResults = 0;
+  bool isFirst = true;
 
   @override
   void initState() {
     super.initState();
+    arrPhotos.clear();
+
+    mController = ScrollController()..addListener(() {
+      if(mController.position.pixels==mController.position.maxScrollExtent){
+        print("End of List");
+
+        mPageNo++;
+        context.read<WallpaperListBloc>().add(GetSearchWallpaper(
+            query: widget.mQuery.replaceAll(" ", "%20"), mColor: widget.mColor, pageNo: mPageNo));
+      }
+    });
 
     context.read<WallpaperListBloc>().add(GetSearchWallpaper(
         query: widget.mQuery.replaceAll(" ", "%20"), mColor: widget.mColor));
@@ -49,6 +47,9 @@ class _WallpaperListPageState extends State<WallpaperListPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.mQuery),
+        ),
         backgroundColor: Colors.black,
         // backgroundColor: Color(0xffD8EBED),
         body: Padding(
@@ -67,16 +68,33 @@ class _WallpaperListPageState extends State<WallpaperListPage> {
                 height: 10,
               ),
               Expanded(
-                  child: BlocBuilder<WallpaperListBloc, WallpaperListState>(
-                builder: (_, state) {
+                  child: BlocListener<WallpaperListBloc, WallpaperListState>(
+                listener: (_, state) {
+
                   if (state is WallpaperListLoadingState) {
-                    return Center(
+                    /*return Center(
                       child: CircularProgressIndicator(),
-                    );
-                  } else if (state is WallpaperListErrorState) {
-                    return Center(child: Text(state.errorMsg));
-                  } else if (state is WallpaperListLoadedState) {
-                    if (state.wallpaperModel.photos!.isNotEmpty) {
+                    );*/
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mPageNo==1?"Loading": "Loading Next Page")));
+                  }
+
+                  else if (state is WallpaperListErrorState) {
+                   /* return Center(child: Text(state.errorMsg));*/
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMsg)));
+
+                  }
+
+
+                  else if (state is WallpaperListLoadedState) {
+                    totalResults = state.wallpaperModel.total_results!;
+                    arrPhotos.addAll(state.wallpaperModel.photos!);
+                    setState(() {
+
+                    });
+
+                    /*if (state.wallpaperModel.photos!.isNotEmpty) {
+                      arrPhotos.addAll(state.wallpaperModel.photos!);
+                      print("arrLength : ${arrPhotos.length}");
                       return Column(
                         children: [
                           Text(
@@ -92,7 +110,8 @@ class _WallpaperListPageState extends State<WallpaperListPage> {
                           // Image of the natural element
                           Expanded(
                             child: GridView.builder(
-                              itemCount: state.wallpaperModel.photos!.length,
+                              controller: mController,
+                              itemCount: arrPhotos.length,
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
@@ -108,9 +127,7 @@ class _WallpaperListPageState extends State<WallpaperListPage> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               WallpaperDetailPage(
-                                                  imgUrl: state
-                                                      .wallpaperModel
-                                                      .photos![index]
+                                                  imgUrl: arrPhotos[index]
                                                       .src!
                                                       .portrait!),
                                         ));
@@ -123,7 +140,7 @@ class _WallpaperListPageState extends State<WallpaperListPage> {
                                       image: DecorationImage(
                                         fit: BoxFit.cover,
                                         image: NetworkImage(
-                                          state.wallpaperModel.photos![index]
+                                          arrPhotos[index]
                                               .src!.portrait!,
                                         ),
                                       ),
@@ -139,15 +156,80 @@ class _WallpaperListPageState extends State<WallpaperListPage> {
                       return Center(
                         child: Text('No Wallpaper found!!'),
                       );
-                    }
+                    }*/
+
                   }
-                  return Container();
+
+
                 },
+                    child: Column(
+                      children: [
+                        Text(
+                          '$totalResults wallpaper available',
+                          style: TextStyle(
+                            fontSize: 22,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        // Image of the natural element
+                        Expanded(
+                          child: GridView.builder(
+                            controller: mController,
+                            itemCount: arrPhotos.length,
+                            gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 11,
+                              mainAxisSpacing: 11,
+                              childAspectRatio: 9 / 16,
+                            ),
+                            itemBuilder: (context, index) {
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            WallpaperDetailPage(
+                                                imgUrl: arrPhotos[index]
+                                                    .src!
+                                                    .portrait!),
+                                      ));
+                                },
+                                child: Container(
+                                  width: 150,
+                                  height: 300,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(
+                                        arrPhotos[index]
+                                            .src!.portrait!,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      ],
+                    ),
               )),
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

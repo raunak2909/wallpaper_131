@@ -183,6 +183,7 @@ class WallpaperPageState extends State<WallpaperPage> {
                                             mQuery: queryController.text
                                                 .toString()),
                                       ));
+                                  arrPhotos.clear();
                                 },
                                 child: Icon(Icons.image_search)),
                             suffixIconColor: Color.fromARGB(255, 172, 172, 172),
